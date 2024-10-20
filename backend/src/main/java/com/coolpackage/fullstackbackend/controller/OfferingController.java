@@ -79,4 +79,9 @@ public class OfferingController {
         offeringRepository.deleteById(id);
         return "Offering with id " + id + " has been deleted successfully.";
     }
+
+    @GetMapping("/offerings/assigned")
+public List<Offering> getAssignedOfferings() {
+    return offeringRepository.findByIsAssigned(true);
+}
 }

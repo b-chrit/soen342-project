@@ -2,14 +2,11 @@ package com.coolpackage.fullstackbackend.model;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.HashSet;
-import java.util.Set;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
 
 @Entity
 public class Offering {
@@ -26,6 +23,9 @@ public class Offering {
     private LocalDate startDate;  
     private LocalDate endDate;    
 
+    // New field to track if the offering is assigned to an instructor
+    private boolean isAssigned = false;  // Default to false (not assigned)
+
     // No-argument constructor
     public Offering() {
     }
@@ -39,6 +39,7 @@ public class Offering {
         this.duration = duration;
         this.startDate = LocalDate.parse(startDate); // Parsing date string to LocalDate
         this.endDate = LocalDate.parse(endDate);
+        this.isAssigned = false; // Initially, offerings are not assigned to an instructor
     }
     // Getters and Setters
     public Long getId() {
@@ -103,5 +104,13 @@ public class Offering {
 
     public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
+    }
+
+    public boolean isAssigned() {
+        return isAssigned;
+    }
+
+    public void setAssigned(boolean isAssigned) {
+        this.isAssigned = isAssigned;
     }
 }
