@@ -11,7 +11,15 @@ export default function Navbar({ userRole, userId }) {
           {/* Conditional link based on user role */}
           <Link
             className="navbar-brand text-uppercase fw-bold fs-4 text-light"
-            to={userRole === "admin" ? "/adminhome" : userRole === "instructor" ? `/instructorhome` : "/"}
+            to={
+              userRole === "admin"
+                ? "/adminhome"
+                : userRole === "instructor"
+                ? `/instructorhome`
+                : userRole === "client"
+                ? `/clienthome`
+                : "/"  // For guests or default fallback
+            }
           >
             SOEN342
           </Link>
@@ -41,15 +49,26 @@ export default function Navbar({ userRole, userId }) {
                   Menu
                 </button>
                 <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                  {/* Common links for all users */}
+                  {/* Always show the Login link */}
                   <li>
                     <Link className="dropdown-item" to="/login">
                       Login
                     </Link>
                   </li>
 
-                  {/* Links only for admin*/}
-                  {userRole !== "instructor" && (
+                  {/* Guest specific menu */}
+                  {!userRole && (
+                    <>
+                      <li>
+                        <Link className="dropdown-item" to="/signup">
+                          Sign Up
+                        </Link>
+                      </li>
+                    </>
+                  )}
+
+                  {/* Links only for admin */}
+                  {userRole === "admin" && (
                     <>
                       <li>
                         <Link className="dropdown-item" to="/addoffering">
@@ -57,13 +76,13 @@ export default function Navbar({ userRole, userId }) {
                         </Link>
                       </li>
                       <li>
-                        <Link className="dropdown-item" to="/">
-                          Manage Bookings
+                        <Link className="dropdown-item" to="/manageaccounts">
+                          Manage Accounts
                         </Link>
                       </li>
                       <li>
-                        <Link className="dropdown-item" to="/manageaccounts">
-                          Manage Accounts
+                        <Link className="dropdown-item" to="/managebookings">
+                          Manage Bookings
                         </Link>
                       </li>
                       <li>
@@ -74,7 +93,7 @@ export default function Navbar({ userRole, userId }) {
                     </>
                   )}
 
-                  {/* Link only for instructors */}
+                  {/* Links only for instructors */}
                   {userRole === "instructor" && (
                     <>
                       <li>
@@ -83,9 +102,20 @@ export default function Navbar({ userRole, userId }) {
                         </Link>
                       </li>
                       <li>
-                        <Link className="dropdown-item" to={`/instructorofferings/${userId}`}>  {/* Use instructor ID */}
+                        <Link className="dropdown-item" to={`/instructorofferings/${userId}`}>
                           My Offerings
-                        </Link> 
+                        </Link>
+                      </li>
+                    </>
+                  )}
+
+                  {/* Links only for clients */}
+                  {userRole === "client" && (
+                    <>
+                      <li>
+                        <Link className="dropdown-item" to={`/clientbookings/${userId}`}>
+                          My Bookings
+                        </Link>
                       </li>
                     </>
                   )}

@@ -2,13 +2,13 @@ import axios from "axios";
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 
-export default function Login({ setIsLoggedIn, setUserRole, setUserId }) {  // Added setUserId
+export default function Login({ setIsLoggedIn, setUserRole, setUserId }) {
   let navigate = useNavigate();
 
   const [loginData, setLoginData] = useState({
     name: "",
     password: "",
-    role: "client", // Default role is "client"
+    role: "client", // Default role is client
   });
 
   const [errorMessage, setErrorMessage] = useState("");
@@ -21,60 +21,59 @@ export default function Login({ setIsLoggedIn, setUserRole, setUserId }) {  // A
 
   const onSubmit = async (e) => {
     e.preventDefault();
+    setErrorMessage(""); // Clear previous error message
+
     try {
-      // Make the login request
       const response = await axios.post(`http://localhost:8080/${role}/login`, loginData); 
       
-      // Check if the response status is 200 and the instructorId is returned
       if (response.status === 200) {
-        setIsLoggedIn(true); // Set login state to true
-        setUserRole(role);  // Set the user role
+        setIsLoggedIn(true); // Update login state
+        setUserRole(role); // Set user role
 
-        const userId = response.data; 
-        setUserId(userId);  // Set the userId in the parent component
-        console.log(userId);
+        const userId = response.data; // Extract user ID from response
+        setUserId(userId); // Set userId in the parent component
 
-        // Navigate based on role
+        // Navigate to appropriate home based on role
         if (role === "admin") {
           navigate("/adminhome");
         } else if (role === "instructor") {
-          navigate("/instructorhome", { state: { userId } });  // Pass the userId as state
+          navigate("/instructorhome", { state: { userId } });
         } else {
-          navigate("/clienthome");
+          navigate("/clienthome", { state: { userId } });
         }
       } else {
-        setErrorMessage("Invalid username or password!"); // Set error message
+        setErrorMessage("Invalid username or password!"); // Show error if login fails
       }
     } catch (error) {
-      console.error("There was an error logging in!", error);
       setErrorMessage("Error logging in. Please try again later.");
     }
   };
-  
+
   return (
     <div className="container mt-5">
-      <div className="row">
-        {/* Welcome Back Message on the left */}
-        <div className="col-md-6 d-flex align-items-center">
+      <div className="row justify-content-center">
+        {/* Welcome Back Message */}
+        <div className="col-lg-5 d-flex align-items-center">
           <div className="card bg-light p-4 shadow-sm text-center">
             <div className="card-body">
-              <h1 className="display-5 text-primary mb-4">Welcome Back!</h1>
+              <h1 className="display-6 text-primary mb-4">Welcome Back!</h1>
               <p className="lead">
-                We're excited to see you again. Please log in to access your account.
+                Please log in to access your account.
               </p>
               <hr />
               <p className="text-muted">
-                Whether you're an admin managing offerings or an instructor updating your schedule, you're in the right place.
+                Whether you're an admin managing offerings, an instructor updating your schedule, or a client booking classes, log in to get started.
               </p>
             </div>
           </div>
         </div>
 
-        {/* Login form on the right */}
-        <div className="col-md-6">
-          <div className="border rounded p-4 shadow">
+        {/* Login form */}
+        <div className="col-lg-5">
+          <div className="border rounded p-4 shadow-lg">
             <h2 className="text-center m-4">Login</h2>
 
+            {/* Display Error Message */}
             {errorMessage && (
               <div className="alert alert-danger alert-dismissible fade show" role="alert">
                 {errorMessage}
@@ -97,7 +96,8 @@ export default function Login({ setIsLoggedIn, setUserRole, setUserId }) {  // A
               </select>
             </div>
 
-            <form onSubmit={(e) => onSubmit(e)}>
+            {/* Login Form */}
+            <form onSubmit={onSubmit}>
               <div className="mb-3">
                 <label htmlFor="name" className="form-label">
                   Username
@@ -109,8 +109,10 @@ export default function Login({ setIsLoggedIn, setUserRole, setUserId }) {  // A
                   name="name"
                   value={name}
                   onChange={onInputChange}
+                  required
                 />
               </div>
+
               <div className="mb-3">
                 <label htmlFor="password" className="form-label">
                   Password
@@ -122,15 +124,28 @@ export default function Login({ setIsLoggedIn, setUserRole, setUserId }) {  // A
                   name="password"
                   value={password}
                   onChange={onInputChange}
+                  required
                 />
               </div>
 
-              <div className="d-flex justify-content-center">
-                <button type="submit" className="btn btn-primary mx-2">
+              {/* Login Button */}
+              <div className="d-grid gap-2 mb-4">
+                <button type="submit" className="btn btn-primary">
                   Login
                 </button>
               </div>
             </form>
+
+            {/* Continue as Guest Option */}
+            <div className="text-center">
+              <p className="text-muted mb-3">Or</p>
+              <button
+                className="btn btn-outline-secondary"
+                onClick={() => navigate("/guesthome")}
+              >
+                Continue as Guest
+              </button>
+            </div>
 
             {/* Sign Up Link */}
             <div className="text-center mt-3">
