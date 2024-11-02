@@ -23,8 +23,10 @@ public class Offering {
     private LocalDate startDate;  
     private LocalDate endDate;    
 
-    // New field to track if the offering is assigned to an instructor
-    private boolean isAssigned = false;  // Default to false (not assigned)
+   
+    private boolean isAssigned = false; 
+
+    private boolean available = true;
 
     // No-argument constructor
     public Offering() {
@@ -112,5 +114,13 @@ public class Offering {
 
     public void setAssigned(boolean isAssigned) {
         this.isAssigned = isAssigned;
+    }
+
+    public boolean isAvailable() {
+        return available;
+    }
+
+    public void setAvailable(boolean available) {
+        this.available = available;
     }
 }
