@@ -1,10 +1,12 @@
 package com.coolpackage.fullstackbackend.controller;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -88,7 +90,6 @@ public class InstructorController {
 
         return foundInstructor.getId(); // Return the instructorId
     }
-// Allow instructor to take on multiple offerings with validation
 @PutMapping("/instructor/{id}/take-offering")
 public Instructor takeOnOffering(@PathVariable Long id, @RequestBody Map<String, Long> request) {
     Long offeringId = request.get("offeringId");
@@ -100,33 +101,30 @@ public Instructor takeOnOffering(@PathVariable Long id, @RequestBody Map<String,
     Offering offering = offeringRepository.findById(offeringId)
             .orElseThrow(() -> new OfferingNotFoundException(offeringId));
 
+    if (!offering.isAvailable()) {
+        throw new IllegalArgumentException("This offering is already booked by a client and is no longer available.");
+    }
+
     return instructorRepository.findById(id)
             .map(instructor -> {
-                // Validate if the offering city is in the instructor's availability
-                String[] availableCities = instructor.getAvailability().split(","); // Assuming cities are comma-separated
-                boolean cityMatches = false;
-                for (String city : availableCities) {
-                    if (offering.getCity().equalsIgnoreCase(city.trim())) {
-                        cityMatches = true;
-                        break;
-                    }
-                }
+                // Validate instructor’s availability for the city
+                String[] availableCities = instructor.getAvailability().split(",");
+                boolean cityMatches = Arrays.stream(availableCities)
+                        .anyMatch(city -> offering.getCity().equalsIgnoreCase(city.trim()));
 
                 if (!cityMatches) {
                     throw new IllegalArgumentException("Offering city is not in the instructor's availability.");
                 }
 
-                // Add offering to instructor
+                // Assign the offering to the instructor
                 instructor.addOffering(offering);
+                offering.setAssigned(true); // Mark the offering as assigned to the instructor
 
-                // Mark the offering as assigned to an instructor
-                offering.setAssigned(true);  // Mark the offering as assigned
-
-                // Save both the offering and instructor changes
                 offeringRepository.save(offering);
                 return instructorRepository.save(instructor);
             }).orElseThrow(() -> new InstructorNotFoundException(id));
 }
+
 
     // Get all offerings for a specific instructor
     @GetMapping("/instructor/{id}/offerings")
@@ -135,4 +133,41 @@ public Instructor takeOnOffering(@PathVariable Long id, @RequestBody Map<String,
                 .orElseThrow(() -> new InstructorNotFoundException(id));
         return instructor.getOfferings();  
     }
+
+    // Cancel an offering-assignment (through Admin) 
+@PutMapping("/admin/cancel-assignment")
+public ResponseEntity<String> cancelAssignment(@RequestBody Map<String, Long> request) {
+    Long offeringId = request.get("offeringId");
+
+    if (offeringId == null) {
+        throw new IllegalArgumentException("Offering ID is required");
+    }
+
+    Offering offering = offeringRepository.findById(offeringId)
+            .orElseThrow(() -> new OfferingNotFoundException(offeringId));
+
+    if (!offering.isAssigned()) {
+        return ResponseEntity.badRequest().body("This offering is not currently assigned to any instructor.");
+    }
+
+    // Find the instructor who is assigned to this offering
+    Instructor assignedInstructor = instructorRepository.findAll().stream()
+            .filter(instructor -> instructor.getOfferings().contains(offering))
+            .findFirst()
+            .orElse(null);
+
+    if (assignedInstructor != null) {
+        // Remove the offering from the instructor's offerings
+        assignedInstructor.getOfferings().remove(offering);
+        instructorRepository.save(assignedInstructor);  // Update the instructor
+    }
+
+    // Update the offering's assignment status
+    offering.setAssigned(false);
+    offering.setAvailable(true);  // Make it available for other assignments if needed
+    offeringRepository.save(offering);  // Save the offering update
+
+    return ResponseEntity.ok("Assignment cancelled successfully.");
+}
+
 }

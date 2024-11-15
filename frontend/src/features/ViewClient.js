@@ -7,9 +7,9 @@ export default function ViewClient() {
     name: "",
     phoneNumber: "",
     age: "",
-    guardian: "",
+    guardian: null,  // Expecting an object if present
     password: "",
-    bookings: [], // Expect an array of bookings
+    bookings: [],
   });
 
   const { id } = useParams();
@@ -22,6 +22,7 @@ export default function ViewClient() {
     try {
       const result = await axios.get(`http://localhost:8080/client/${id}`);
       setClient(result.data);
+      console.log("Client data:", result.data);  // Debugging log
     } catch (error) {
       console.error("Error fetching client details", error);
     }
@@ -35,7 +36,7 @@ export default function ViewClient() {
 
           <div className="card">
             <div className="card-header">
-              Details of Client id : {client.id}
+              Details of Client ID : {client.id}
               <ul className="list-group list-group-flush">
                 <li className="list-group-item">
                   <b>Name:</b> {client.name}
@@ -47,7 +48,16 @@ export default function ViewClient() {
                   <b>Age:</b> {client.age}
                 </li>
                 <li className="list-group-item">
-                  <b>Guardian:</b> {client.guardian || "N/A"}
+                  <b>Guardian:</b>{" "}
+                  {client.guardian ? (
+                    <ul>
+                      <li><b>ID:</b> {client.guardian.id}</li>
+                      <li><b>Name:</b> {client.guardian.name}</li>
+                      <li><b>Phone Number:</b> {client.guardian.phoneNumber}</li>
+                    </ul>
+                  ) : (
+                    "N/A"
+                  )}
                 </li>
                 <li className="list-group-item">
                   <b>Password:</b> {client.password}
