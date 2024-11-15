@@ -5,7 +5,6 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Set;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -21,23 +20,32 @@ import com.coolpackage.fullstackbackend.exception.ClientNotFoundException;
 import com.coolpackage.fullstackbackend.exception.OfferingNotFoundException;
 import com.coolpackage.fullstackbackend.model.Booking;
 import com.coolpackage.fullstackbackend.model.Client;
+import com.coolpackage.fullstackbackend.model.Guardian;
 import com.coolpackage.fullstackbackend.model.Offering;
 import com.coolpackage.fullstackbackend.repository.BookingRepository;
 import com.coolpackage.fullstackbackend.repository.ClientRepository;
+import com.coolpackage.fullstackbackend.repository.GuardianRepository;
 import com.coolpackage.fullstackbackend.repository.OfferingRepository;
 
 @RestController
 @CrossOrigin("http://localhost:3000")
 public class ClientController {
 
-    @Autowired
-    private ClientRepository clientRepository;
-    
-    @Autowired
-    private OfferingRepository offeringRepository;
-    
-    @Autowired
-    private BookingRepository bookingRepository;
+    private final ClientRepository clientRepository;
+    private final OfferingRepository offeringRepository;
+    private final BookingRepository bookingRepository;
+    private final GuardianRepository guardianRepository;
+
+    // Constructor-based dependency injection
+    public ClientController(ClientRepository clientRepository,
+                            OfferingRepository offeringRepository,
+                            BookingRepository bookingRepository,
+                            GuardianRepository guardianRepository) {
+        this.clientRepository = clientRepository;
+        this.offeringRepository = offeringRepository;
+        this.bookingRepository = bookingRepository;
+        this.guardianRepository = guardianRepository;
+    }
 
     // Get all clients
     @GetMapping("/clients")
@@ -97,6 +105,32 @@ public class ClientController {
         return foundClient.getId(); // Return the client ID
     }
 
+// Register a guardian for an underage client
+@PostMapping("/client/{clientId}/register-guardian")
+public ResponseEntity<String> registerGuardianForClient(
+        @PathVariable Long clientId, @RequestBody Guardian guardianData) {
+
+    // Find the client by ID
+    Client client = clientRepository.findById(clientId)
+            .orElseThrow(() -> new ClientNotFoundException(clientId));
+
+    // Check if the client is underage
+    if (!client.isUnderage()) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body("Only underage clients can register a guardian.");
+    }
+
+    // Save the guardian to get an ID
+    Guardian savedGuardian = guardianRepository.save(guardianData);
+
+    // Associate the guardian with the client and save the client
+    client.setGuardian(savedGuardian);
+    clientRepository.save(client);
+
+    return ResponseEntity.ok("Guardian registered and associated with client successfully.");
+}
+
+
 // Make a booking for a client
 @PostMapping("/client/{clientId}/make-booking")
 public ResponseEntity<String> makeBooking(@PathVariable Long clientId, @RequestBody Long offeringId) {
@@ -104,9 +138,21 @@ public ResponseEntity<String> makeBooking(@PathVariable Long clientId, @RequestB
     Client client = clientRepository.findById(clientId)
             .orElseThrow(() -> new ClientNotFoundException(clientId));
 
+    // Check if the client is underage and requires a guardian
+    if (client.isUnderage() && client.getGuardian() == null) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body("Underage clients must have a guardian registered before making a booking.");
+    }
+
     // Find the offering by ID
     Offering offering = offeringRepository.findById(offeringId)
             .orElseThrow(() -> new OfferingNotFoundException(offeringId));
+
+    // Ensure the offering is still available
+    if (!offering.isAvailable()) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body("This offering is no longer available for booking.");
+    }
 
     // Check for conflicting bookings (same date and time)
     LocalDate offeringDate = offering.getStartDate();  // The date of the offering
@@ -114,7 +160,8 @@ public ResponseEntity<String> makeBooking(@PathVariable Long clientId, @RequestB
 
     List<Booking> conflictingBookings = bookingRepository.findByClientIdAndBookingDateAndTime(clientId, offeringDate, offeringTime);
     if (!conflictingBookings.isEmpty()) {
-        return ResponseEntity.status(HttpStatus.CONFLICT).body("Client already has a booking on the same date and time.");
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body("Client already has a booking on the same date and time.");
     }
 
     // Create a new booking if no conflicts
@@ -134,8 +181,6 @@ public ResponseEntity<String> makeBooking(@PathVariable Long clientId, @RequestB
     return ResponseEntity.ok("Booking successfully created.");
 }
 
-    
-    
 
     // Get all bookings for a client
     @GetMapping("/client/{clientId}/bookings")

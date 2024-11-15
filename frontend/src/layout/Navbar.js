@@ -86,8 +86,8 @@ export default function Navbar({ userRole, userId }) {
                         </Link>
                       </li>
                       <li>
-                        <Link className="dropdown-item" to="/">
-                          Manage Records
+                        <Link className="dropdown-item" to="/manageofferings">
+                          Manage Offerings
                         </Link>
                       </li>
                     </>
@@ -97,7 +97,7 @@ export default function Navbar({ userRole, userId }) {
                   {userRole === "instructor" && (
                     <>
                       <li>
-                        <Link className="dropdown-item" to="/registeravailability">
+                        <Link className="dropdown-item" to={`/registeravailability/${userId}`}>
                           Register Availability
                         </Link>
                       </li>

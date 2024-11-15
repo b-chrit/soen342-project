@@ -23,9 +23,10 @@ public class Offering {
     private LocalDate startDate;  
     private LocalDate endDate;    
 
-   
-    private boolean isAssigned = false; 
+    // Field for indicating instructor assignment
+    private boolean isAssigned = false;
 
+    // Field for client booking availability
     private boolean available = true;
 
     // No-argument constructor
@@ -42,7 +43,9 @@ public class Offering {
         this.startDate = LocalDate.parse(startDate); // Parsing date string to LocalDate
         this.endDate = LocalDate.parse(endDate);
         this.isAssigned = false; // Initially, offerings are not assigned to an instructor
+        this.available = true; // Initially, offerings are available for client booking
     }
+
     // Getters and Setters
     public Long getId() {
         return id;

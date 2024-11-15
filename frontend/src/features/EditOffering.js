@@ -8,6 +8,7 @@ export default function EditOffering() {
 
   const [offering, setOffering] = useState({
     location: "",
+    city: "",  // Add city field here
     time: "",
     type: "",
     duration: "",
@@ -15,7 +16,7 @@ export default function EditOffering() {
     endDate: "",
   });
 
-  const { location, time, type, duration, startDate, endDate } = offering;
+  const { location, city, time, type, duration, startDate, endDate } = offering;
 
   const onInputChange = (e) => {
     setOffering({ ...offering, [e.target.name]: e.target.value });
@@ -53,6 +54,19 @@ export default function EditOffering() {
                 placeholder="Enter the location"
                 name="location"
                 value={location}
+                onChange={(e) => onInputChange(e)}
+              />
+            </div>
+            <div className="mb-3">
+              <label htmlFor="City" className="form-label">  {/* Add city field label */}
+                City
+              </label>
+              <input
+                type={"text"}
+                className="form-control"
+                placeholder="Enter the city"
+                name="city"  // Make sure name matches the state property
+                value={city}
                 onChange={(e) => onInputChange(e)}
               />
             </div>

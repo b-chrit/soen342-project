@@ -11,7 +11,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 public class Client {
@@ -26,30 +26,29 @@ public class Client {
     private int age;
     private boolean isUnderage;
 
+    // @JsonManagedReference
     @ManyToOne
     @JoinColumn(name = "guardian_id")
-    private Client guardian;  // Reference to the guardian if underage
+    private Guardian guardian;
 
-    @JsonManagedReference
+    // @JsonManagedReference
+    @JsonIgnoreProperties({"client"})
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
-    private Set<Booking> bookings;  // List of bookings made by the client
+    private Set<Booking> bookings;
 
-    // Default constructor
-    public Client() {
-    }
+    // Constructors
+    public Client() {}
 
-    // Constructor without the guardian (for non-underage clients)
     public Client(String name, String password, String phoneNumber, int age, Set<Booking> bookings) {
         this.name = name;
         this.password = password;
         this.phoneNumber = phoneNumber;
         this.age = age;
-        this.isUnderage = age < 18;  // Automatically set underage status based on age
+        this.isUnderage = age < 18;
         this.bookings = bookings;
     }
 
-    // Constructor with the guardian (for underage clients)
-    public Client(String name, String password, String phoneNumber, int age, Client guardian, Set<Booking> bookings) {
+    public Client(String name, String password, String phoneNumber, int age, Guardian guardian, Set<Booking> bookings) {
         this.name = name;
         this.password = password;
         this.phoneNumber = phoneNumber;
@@ -105,11 +104,11 @@ public class Client {
         return isUnderage;
     }
 
-    public Client getGuardian() {
+    public Guardian getGuardian() {
         return guardian;
     }
 
-    public void setGuardian(Client guardian) {
+    public void setGuardian(Guardian guardian) {
         this.guardian = guardian;
     }
 
