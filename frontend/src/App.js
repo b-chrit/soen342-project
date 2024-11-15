@@ -19,6 +19,9 @@ import ViewClient from "./features/ViewClient";
 import GuestHome from "./pages/GuestHome"; 
 import ManageBookings from "./features/ManageBookings";
 import ViewBooking from "./features/ViewBooking";
+import ViewGuardian from "./features/ViewGuardian";
+import RegisterAvailability from "./features/RegisterAvailability";
+import ManageOfferings from "./features/ManageOfferings";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false); // State to track login status
@@ -55,6 +58,8 @@ function App() {
                 <Route exact path="/viewclient/:id" element={<ViewClient />} />
                 <Route exact path="/managebookings" element={<ManageBookings />} />
                 <Route exact path="/viewbooking/:id" element={<ViewBooking />} />
+                <Route path="/viewguardian/:id" element={<ViewGuardian />} />
+                <Route exact path="/manageofferings" element={<ManageOfferings />} />
               </>
             )}
 
@@ -63,6 +68,7 @@ function App() {
                 <Route exact path="/instructorhome" element={<InstructorHome />} />
                 <Route exact path="/viewoffering/:id" element={<ViewOffering userRole={userRole} />} />
                 <Route exact path="/instructorofferings/:id" element={<InstructorOfferings />} />  {/* Use userId */}
+                <Route exact path="/registeravailability/:id" element={<RegisterAvailability />} />
               </>
             )}
 

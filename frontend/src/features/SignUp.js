@@ -106,7 +106,7 @@ export default function Signup({ setIsLoggedIn, setUserRole, setUserId }) {
                 <input
                   type="text"
                   className="form-control"
-                  placeholder="Enter your name"
+                  placeholder="Name"
                   name="name"
                   value={name}
                   onChange={onInputChange}
@@ -119,7 +119,7 @@ export default function Signup({ setIsLoggedIn, setUserRole, setUserId }) {
                 <input
                   type="password"
                   className="form-control"
-                  placeholder="Enter your password"
+                  placeholder="Password"
                   name="password"
                   value={password}
                   onChange={onInputChange}
@@ -132,7 +132,7 @@ export default function Signup({ setIsLoggedIn, setUserRole, setUserId }) {
                 <input
                   type="text"
                   className="form-control"
-                  placeholder="Enter your phone number"
+                  placeholder="Phone Number"
                   name="phoneNumber"
                   value={phoneNumber}
                   onChange={onInputChange}
@@ -147,7 +147,7 @@ export default function Signup({ setIsLoggedIn, setUserRole, setUserId }) {
                     <input
                       type="text"
                       className="form-control"
-                      placeholder="Enter your specialization"
+                      placeholder="Specialization"
                       name="specialization"
                       value={specialization}
                       onChange={onInputChange}
@@ -160,12 +160,15 @@ export default function Signup({ setIsLoggedIn, setUserRole, setUserId }) {
                     <input
                       type="text"
                       className="form-control"
-                      placeholder="Enter your availability"
+                      placeholder="Cities"
                       name="availability"
                       value={availability}
                       onChange={onInputChange}
                       required
                     />
+                    <small className="form-text text-muted">
+                      You Can Enter multiple cities separated by commas (e.g., Montreal, Laval).
+                    </small>
                   </div>
                 </>
               )}
@@ -176,7 +179,7 @@ export default function Signup({ setIsLoggedIn, setUserRole, setUserId }) {
                   <input
                     type="number"
                     className="form-control"
-                    placeholder="Enter your age"
+                    placeholder="Age"
                     name="age"
                     value={age}
                     onChange={onInputChange}

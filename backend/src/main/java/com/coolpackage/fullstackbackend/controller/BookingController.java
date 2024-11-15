@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.coolpackage.fullstackbackend.exception.BookingNotFoundException;
 import com.coolpackage.fullstackbackend.model.Booking;
+import com.coolpackage.fullstackbackend.model.Offering;
 import com.coolpackage.fullstackbackend.repository.BookingRepository;
+import com.coolpackage.fullstackbackend.repository.OfferingRepository;
 
 @RestController
 @CrossOrigin("http://localhost:3000")
@@ -22,6 +24,9 @@ public class BookingController {
 
     @Autowired
     private BookingRepository bookingRepository;
+
+    @Autowired
+    private OfferingRepository offeringRepository;
 
     // Create a new booking
     @PostMapping("/bookings")
@@ -45,12 +50,21 @@ public class BookingController {
     }
 
     // Delete a booking
-    @DeleteMapping("/booking/{id}")
-    public ResponseEntity<String> deleteBooking(@PathVariable Long id) {
-        if (!bookingRepository.existsById(id)) {
-            throw new BookingNotFoundException(id);
-        }
-        bookingRepository.deleteById(id);
-        return ResponseEntity.ok("Booking with ID " + id + " has been deleted successfully.");
+@DeleteMapping("/booking/{id}")
+public ResponseEntity<String> deleteBooking(@PathVariable Long id) {
+    Booking booking = bookingRepository.findById(id)
+            .orElseThrow(() -> new BookingNotFoundException(id));
+
+    // Retrieve the associated offering and mark it as available
+    Offering offering = booking.getOffering();
+    if (offering != null) {
+        offering.setAvailable(true);
+        offeringRepository.save(offering); // Save the updated offering
     }
+
+    // Delete the booking
+    bookingRepository.deleteById(id);
+
+    return ResponseEntity.ok("Booking with ID " + id + " has been deleted successfully.");
+}
 }
