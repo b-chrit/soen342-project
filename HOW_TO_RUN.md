@@ -2,6 +2,16 @@
 
 ---
 
+#### **Hosted Version**
+The application is hosted and accessible at:  
+**[http://my-bucket-baraa.s3-website.us-east-2.amazonaws.com/](http://my-bucket-baraa.s3-website.us-east-2.amazonaws.com/)**
+
+---
+
+#### **If You Wish to Run It on Your Machine**
+
+---
+
 #### **1. Running the Backend (Spring Boot)**
 1. Navigate to the backend directory:
    ```bash
