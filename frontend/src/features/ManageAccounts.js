@@ -5,10 +5,12 @@ import { Link } from "react-router-dom";
 export default function ManageAccounts() {
   const [instructors, setInstructors] = useState([]);
   const [clients, setClients] = useState([]);
+  const [guardians, setGuardians] = useState([]); // New state for guardians
 
   useEffect(() => {
     loadInstructors();
     loadClients();
+    loadGuardians(); // Load guardians when the component mounts
   }, []);
 
   const loadInstructors = async () => {
@@ -21,14 +23,24 @@ export default function ManageAccounts() {
     setClients(result.data);
   };
 
+  const loadGuardians = async () => {
+    const result = await axios.get("http://localhost:8080/guardians");
+    setGuardians(result.data);
+  };
+
   const deleteInstructor = async (id) => {
     await axios.delete(`http://localhost:8080/instructor/${id}`);
-    loadInstructors(); // Refresh the list after deleting
+    loadInstructors();
   };
 
   const deleteClient = async (id) => {
     await axios.delete(`http://localhost:8080/client/${id}`);
-    loadClients(); // Refresh the list after deleting
+    loadClients();
+  };
+
+  const deleteGuardian = async (id) => {
+    await axios.delete(`http://localhost:8080/guardians/${id}`);
+    loadGuardians();
   };
 
   return (
@@ -36,11 +48,8 @@ export default function ManageAccounts() {
       <div className="py-4">
         <h2 className="text-center mb-4">Accounts</h2>
 
-        {/* Title for Instructors Table */}
-        <h3 style={{ textAlign: 'left', fontWeight: 'bold', marginBottom: '10px', fontSize: '1.5rem' }}>
-          Instructors
-        </h3>
-
+        {/* Instructors Table */}
+        <h3 className="mt-4 mb-2">Instructors</h3>
         <table className="table border shadow">
           <thead>
             <tr>
@@ -63,16 +72,10 @@ export default function ManageAccounts() {
                 <td>{instructor.availability}</td>
                 <td>{instructor.password}</td>
                 <td className="text-center">
-                  <Link
-                    className="btn btn-primary mx-2"
-                    to={`/viewinstructor/${instructor.id}`}
-                  >
+                  <Link className="btn btn-primary mx-2" to={`/viewinstructor/${instructor.id}`}>
                     View
                   </Link>
-                  <button
-                    className="btn btn-danger mx-2"
-                    onClick={() => deleteInstructor(instructor.id)}
-                  >
+                  <button className="btn btn-danger mx-2" onClick={() => deleteInstructor(instructor.id)}>
                     Delete
                   </button>
                 </td>
@@ -81,11 +84,8 @@ export default function ManageAccounts() {
           </tbody>
         </table>
 
-        {/* Title for Clients Table */}
-        <h3 style={{ textAlign: 'left', fontWeight: 'bold', marginTop: '30px', marginBottom: '10px', fontSize: '1.5rem' }}>
-          Clients
-        </h3>
-
+        {/* Clients Table */}
+        <h3 className="mt-4 mb-2">Clients</h3>
         <table className="table border shadow">
           <thead>
             <tr>
@@ -105,19 +105,43 @@ export default function ManageAccounts() {
                 <td>{client.name}</td>
                 <td>{client.phoneNumber}</td>
                 <td>{client.age}</td>
-                <td>{client.guardian || 'N/A'}</td>
+                <td>{client.guardian ? client.guardian.name : "N/A"}</td>
                 <td>{client.password}</td>
                 <td className="text-center">
-                <Link
-                  className="btn btn-primary mx-2"
-                  to={`/viewclient/${client.id}`}  // Add this link for viewing client details
-                  >
+                  <Link className="btn btn-primary mx-2" to={`/viewclient/${client.id}`}>
                     View
                   </Link>
-                  <button
-                    className="btn btn-danger mx-2"
-                    onClick={() => deleteClient(client.id)}
-                  >
+                  <button className="btn btn-danger mx-2" onClick={() => deleteClient(client.id)}>
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        {/* Guardians Table */}
+        <h3 className="mt-4 mb-2">Guardians</h3>
+        <table className="table border shadow">
+          <thead>
+            <tr>
+              <th scope="col">ID</th>
+              <th scope="col">Name</th>
+              <th scope="col">Phone Number</th>
+              <th scope="col" className="text-center">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {guardians.map((guardian, index) => (
+              <tr key={index}>
+                <th scope="row">{index + 1}</th>
+                <td>{guardian.name}</td>
+                <td>{guardian.phoneNumber}</td>
+                <td className="text-center">
+                  <Link className="btn btn-primary mx-2" to={`/viewguardian/${guardian.id}`}>
+                    View
+                  </Link>
+                  <button className="btn btn-danger mx-2" onClick={() => deleteGuardian(guardian.id)}>
                     Delete
                   </button>
                 </td>

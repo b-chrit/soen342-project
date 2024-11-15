@@ -24,7 +24,12 @@ export default function Login({ setIsLoggedIn, setUserRole, setUserId }) {
     setErrorMessage(""); // Clear previous error message
 
     try {
-      const response = await axios.post(`http://localhost:8080/${role}/login`, loginData); 
+      const response = await axios.post(
+        `http://localhost:8080/${role}/login`,
+        JSON.stringify(loginData),
+        { headers: { "Content-Type": "application/json" } }
+      );
+      
       
       if (response.status === 200) {
         setIsLoggedIn(true); // Update login state

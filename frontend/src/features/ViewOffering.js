@@ -54,6 +54,9 @@ export default function ViewOffering({ userRole }) {
               Details of Offering id : {offering.id}
               <ul className="list-group list-group-flush">
                 <li className="list-group-item">
+                  <b>City:</b> {offering.city}
+                </li>
+                <li className="list-group-item">
                   <b>Location:</b> {offering.location}
                 </li>
                 <li className="list-group-item">
@@ -84,6 +87,11 @@ export default function ViewOffering({ userRole }) {
             {userRole === "instructor" && (
               <Link className="btn btn-primary my-2" to={"/instructorhome"}>
                 Back to Instructor Home
+              </Link>
+            )}
+            {userRole === "client" && (
+              <Link className="btn btn-primary my-2" to={"/clienthome"}>
+                Back to Client Home
               </Link>
             )}
           </div>
