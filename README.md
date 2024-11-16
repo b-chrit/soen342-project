@@ -1,5 +1,11 @@
 # SOEN 342 - Fall 2024 Project
 
+## Video
+
+
+https://github.com/user-attachments/assets/0fac4981-7bc7-457e-aaf7-7a10f61cbaa4
+
+
 ## Project Overview
 This repository contains the project for SOEN 342: Software Requirements and Deployment at Concordia University (Fall 2024). The system under development is designed to manage lesson offerings, instructor availability, and client bookings across multiple locations for an organization that offers group or private lessons.
 
